@@ -2,19 +2,28 @@ let routes = [
     {
         path: '/',
         name: 'layout',
+      
         redirect: { name: 'index' },
         component: 'Layout',
         children: [
             {
                 path: 'index',
                 name: 'index',
+                meta:{title:'后台首页'},
                 component: 'index/Index'
+            },
+            {
+                path:'goodlist',
+                name:'goodlist',
+                meta:{title:'商品列表'},
+                component:'shop/GoodList'
             }
         ]
     },
     {
         path: '/login',
         name: 'login',
+        meta: { title: '登录' },
         component: 'login/Login'
     },
     {
@@ -41,4 +50,7 @@ function createRoute(arr){
         }
     }
 }
+
+
+
 export default getRoutes()
