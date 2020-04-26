@@ -29,7 +29,7 @@
                 <el-aside width="200px" >
                      <el-menu
                      style="height:100%"
-                    default-active="0"
+                    :default-active="slideMenuActive"
                     @select="slideSelect"
                     >
                     <el-menu-item :index="index|numToString" v-for="(item,index) in slideMenus" :key="index">
@@ -38,17 +38,35 @@
                     </el-menu-item>
                     </el-menu>
                 </el-aside>
-                <el-main>
+                <el-main class="bg-light" style="height:100%">
                     <!-- 面包屑导航 -->
-                   <div class="border-bottom mb-3" style="padding:20px;margin:-20px" v-if="bran.length>0">
+                   <div class="border-bottom mb-3 bg-white" style="padding:20px;margin:-20px" v-if="bran.length>0">
                         <el-breadcrumb separator="/">
                             <el-breadcrumb-item v-for="(item,index) in bran" :key="index"
                                 :to="{path:item.path}"
                             >{{item.title}}</el-breadcrumb-item>
                         </el-breadcrumb>
                    </div>
+                  
                    <!-- 主内容 -->
                     <router-view ></router-view>
+                    
+                   <!-- 回到顶部 -->
+                   <el-backtop target=".el-main" :bottom="100">
+                    <div
+                    style="{
+                        height: 100%;
+                        width: 100%;
+                        background-color: #f2f5f6;
+                        box-shadow: 0 0 6px rgba(0,0,0, .12);
+                        text-align: center;
+                        line-height: 40px;
+                        color: #1989fa;
+                    }"
+                    >
+                    UP
+                    </div>
+                </el-backtop>
                 </el-main>
             </el-container>
         </el-container>
@@ -83,9 +101,9 @@ import mixins from '../common/mixins/mixins'
         }
     },
     computed:{
-        slidemenuActive:{
+        slideMenuActive:{
             get(){
-                return this.this.navBar.list[this.navBar.active].subActive || '0'
+                return this.navBar.list[this.navBar.active].subActive || '0'
             },
             set(val){
                 this.navBar.list[this.navBar.active].subActive = val
@@ -102,7 +120,7 @@ import mixins from '../common/mixins/mixins'
             if(r){
                 r = JSON.parse(r)
                 this.navBar.active = r.top
-                this.slidemenuActive = r.left
+                this.slideMenuActive = r.left
             }
         },
         //面包屑导航
@@ -136,7 +154,8 @@ import mixins from '../common/mixins/mixins'
         
       },
       slideSelect(key, keyPath) {
-        this.slidemenuActive = key
+          console.log(key)
+        this.slideMenuActive = key
         //跳转到指定页面
         this.$router.push({
             name:this.slideMenus[key].pathname

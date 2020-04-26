@@ -21,7 +21,7 @@ export default{
             },
             {
                 name: '商品',
-                subActive: '0',
+                subActive: '1',
                 submenu: [
                     {
                         icon: 'el-icon-s-claim',
