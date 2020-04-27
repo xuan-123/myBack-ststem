@@ -17,6 +17,12 @@ let routes = [
                 name:'goodlist',
                 meta:{title:'商品列表'},
                 component:'shop/GoodList'
+            },
+            {
+                path:'image',
+                name:'image',
+                meta:{title:'相册管理'},
+                component:'image/Image'
             }
         ]
     },

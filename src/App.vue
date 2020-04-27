@@ -17,5 +17,31 @@ export default {
 </script>
 
 <style>
+  ::-webkit-scrollbar-track-piece { 
+background-color:#f8f8f8;
 
+}
+
+::-webkit-scrollbar {
+width:9px;
+
+height:9px;
+
+}
+
+::-webkit-scrollbar-thumb {
+
+background-color:#dddddd;
+
+background-clip:padding-box;
+
+min-height:28px;
+
+}
+
+::-webkit-scrollbar-thumb:hover {
+
+background-color:#bbb;
+
+}
 </style>

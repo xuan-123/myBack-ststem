@@ -38,7 +38,7 @@
                     </el-menu-item>
                     </el-menu>
                 </el-aside>
-                <el-main class="bg-light" style="height:100%">
+                <el-main class="bg-light" style="position:relative;height:100%">
                     <!-- 面包屑导航 -->
                    <div class="border-bottom mb-3 bg-white" style="padding:20px;margin:-20px" v-if="bran.length>0">
                         <el-breadcrumb separator="/">
@@ -143,6 +143,15 @@ import mixins from '../common/mixins/mixins'
             console.log(arr)
         },
       handleSelect(key, keyPath) {
+       
+          if(key === '6-1'){
+              return console.log('修改')
+          }
+          if(key === '6-2'){
+              {
+              return console.log('退出')
+          }
+          }
         this.navBar.active = key
         //默认选中跳转到当前激活
         this.slideMenuActive ='0'

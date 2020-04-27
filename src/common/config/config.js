@@ -16,6 +16,11 @@ export default{
                         icon: 'el-icon-s-claim',
                         name: '商品列表',
                         pathname:'goodlist'
+                    },
+                    {
+                        icon:'el-icon-picture',
+                        name:'相册管理',
+                        pathname:'image'
                     }
                 ]
             },
