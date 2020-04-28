@@ -15,7 +15,7 @@
       <el-button type="primary" size="mini">搜索</el-button>
       </div>
       <el-button type="success" size="mini" @click=openAlbum(false)>创建相册</el-button>
-      <el-button type="warning" size="mini">上传图片</el-button>
+      <el-button type="warning" size="mini" @click="uploadModel=true">上传图片</el-button>
 
   </el-header>
   <el-container>
@@ -33,7 +33,21 @@
     <el-container >
         <!-- 主内容 -->
       <el-main style="position:absolute;top:60px;left:200px;bottom:60px;right:0">
-
+            <el-row :gutter="10">
+                <el-col :span="24" :lg="4" :md="6" :sm="8" v-for="(item,index) in imageList" :key="index">
+                    <el-card class="box-card mb-3 position-relative" shadow="hover" :body-style="{'padding':'0'}">
+                        <img :src="item.url" class="w-100" style="height:120px" alt="">
+                        <div  style="background:rgba(0,0,0,.3);margin-top:-25px;position:absolute;width:100%;text-align:center;color:#fff">{{item.name}}</div>
+                        <div class="p-2 ml-5">
+                            <el-button-group>
+                                <el-button type="" @click="priview(item)" size="mini" icon="el-icon-view"></el-button>
+                                <el-button type="" @click="editImage(item,index)" size="mini" icon="el-icon-share"></el-button>
+                                <el-button type="" @click="delImage(item,index)" size="mini" icon="el-icon-delete"></el-button>
+                            </el-button-group>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>
       </el-main>
     </el-container>
   </el-container>
@@ -41,7 +55,7 @@
 </el-container>
 <!-- 修改创建相册 -->
 <el-dialog
-    title="修改相册"
+    :title="albumModelTitle"
     :visible.sync="albumModel"
     >
     <el-form ref="form" :model="albumForm" label-width="80px">
@@ -61,6 +75,29 @@
         <el-button type="primary" @click="confimalbumModel">确 定</el-button>
     </span>
 </el-dialog>
+<!-- 上传图片 -->
+<el-dialog title="上传图片" class="m-auto" style="width:1000px" :visible.sync="uploadModel">
+    <el-upload
+        class="upload-demo ml-5"
+        drag
+        action="https://jsonplaceholder.typicode.com/posts/"
+        multiple>
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+    </el-upload>
+    <div class="dialog-footer" slot="footer">
+        <el-button @click="uploadModel = false">取消</el-button>
+        <el-button type="primary" @click="uploadModel = false">确定</el-button>
+    </div>
+</el-dialog>
+<!-- 预览图片 -->
+<el-dialog :visible.sync="previewModel" width="60%" top="5vh">
+    <div style="margin:-60px -20px -30px -20px">
+        <img class="w-100" style="height:600px" :src="prevImage" alt="">
+    </div>
+
+</el-dialog>
 </div>
 </template>
 <script>
@@ -71,7 +108,10 @@ import AlbumsList from '../../components/image/AlbumsList'
         },
         data(){
             return{
+                previewModel:false,
+                uploadModel:false,
                 albumModel:false,
+                prevImage:'',
                 searchForm:{
                     order:"",
                     keyword:""
@@ -84,13 +124,87 @@ import AlbumsList from '../../components/image/AlbumsList'
                 },
                 albums:[
 
+                ],
+                imageList:[
+                    {
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片1',
+                    },
+                    {
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片1',
+                    },
+                    {
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片1',
+                    },
+                    {
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片1',
+                    },
+                    {
+                        url:'https://dss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2972732503,3430499099&fm=111&gp=0.jpg',
+                        name:'图片1',
+                    },
+                    {
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片1',
+                    },
+                    {
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片1',
+                    },
+
                 ]
+
+            }
+        },
+        computed:{
+            albumModelTitle(){
+                return this.albumsEditIndex>-1?'修改相册':'创建相册'
             }
         },
         created(){
             this.__init()
         },
         methods:{
+            editImage(item,index){
+                this.$prompt('请输入名称', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputValue:item.name,
+                inputValidator(val){
+                    if(val ===''){
+                        return '图片名称'
+                    }
+                }
+                }).then(({ value }) => {
+                    item.name = value
+                this.$message({
+                    type: 'success',
+                    message: '修改成功'
+                });
+                })
+            },
+          delImage(item,index){
+              this.$confirm('是否删除', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type:"warning"
+                }).then(() => {
+                      this.imageList.splice(index,1)
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功' 
+                        });
+                })
+     
+          },
+            //预览图片
+            priview(item){
+                this.prevImage=item.url
+                this.previewModel=true
+            },
             // 相册左侧数据
             __init(){
                 for(var i = 0;i<20;i++){
