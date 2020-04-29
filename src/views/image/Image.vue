@@ -24,7 +24,7 @@
        <ul class="list-group list-group-flush">
  <!-- 相册左侧栏 -->
            <albums-list v-for="(item,index) in albums" :key="index" :albumindex="albumsIndex===index" :item="item" :index="index"
-            @change="imageList"
+            @change="imageLists"
             @edit="openAlbum"
             @del="imageDel"
            ></albums-list>
@@ -34,16 +34,19 @@
         <!-- 主内容 -->
       <el-main style="position:absolute;top:60px;left:200px;bottom:60px;right:0">
             <el-row :gutter="10">
-                <el-col :span="24" :lg="4" :md="6" :sm="8" v-for="(item,index) in imageList" :key="index">
-                    <el-card class="box-card mb-3 position-relative" shadow="hover" :body-style="{'padding':'0'}">
-                        <img :src="item.url" class="w-100" style="height:120px" alt="">
-                        <div  style="background:rgba(0,0,0,.3);margin-top:-25px;position:absolute;width:100%;text-align:center;color:#fff">{{item.name}}</div>
-                        <div class="p-2 ml-5">
+                <el-col class="elcol" :span="24" :lg="4" :md="6" :sm="8" style="box-sizing:border-box"  v-for="(item,index) in imageList" :key="index">
+                    <el-card class="box-card mb-3 position-relative"  shadow="hover" :body-style="{'padding':'0'}">
+                        <div :class="{'redborder':item.isChoose}"  >
+                            <span class="badge badge-danger" style="position:absolute;right:0;top:0" v-if="item.isChoose" >{{item.ChooseOrder}}</span>
+                            <img :src="item.url"  class=" w-100" style="height:120px" alt="" @click="imageClick(item)">
+                            <div  style="background:rgba(0,0,0,.3);margin-top:-25px;position:absolute;width:100%;text-align:center;color:#fff">{{item.name}}</div>
+                            <div class="p-2 ml-5">
                             <el-button-group>
                                 <el-button type="" @click="priview(item)" size="mini" icon="el-icon-view"></el-button>
                                 <el-button type="" @click="editImage(item,index)" size="mini" icon="el-icon-share"></el-button>
                                 <el-button type="" @click="delImage(item,index)" size="mini" icon="el-icon-delete"></el-button>
                             </el-button-group>
+                        </div>
                         </div>
                     </el-card>
                 </el-col>
@@ -125,35 +128,11 @@ import AlbumsList from '../../components/image/AlbumsList'
                 albums:[
 
                 ],
+                ChooseList:[],
                 imageList:[
-                    {
-                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
-                        name:'图片1',
-                    },
-                    {
-                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
-                        name:'图片1',
-                    },
-                    {
-                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
-                        name:'图片1',
-                    },
-                    {
-                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
-                        name:'图片1',
-                    },
-                    {
-                        url:'https://dss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2972732503,3430499099&fm=111&gp=0.jpg',
-                        name:'图片1',
-                    },
-                    {
-                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
-                        name:'图片1',
-                    },
-                    {
-                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
-                        name:'图片1',
-                    },
+                   
+                    
+                    
 
                 ]
 
@@ -168,6 +147,29 @@ import AlbumsList from '../../components/image/AlbumsList'
             this.__init()
         },
         methods:{
+            imageClick(item){
+                if(!item.isChoose){
+                    this.ChooseList.push({id:item.id,url:item.url })
+                    item.ChooseOrder = this.ChooseList.length
+                    item.isChoose = true
+                    return;
+                }
+                let i = this.ChooseList.findIndex(v=>v.id === item.id)
+                if(i === -1) return 
+                let length = this.ChooseList.length
+                if(i+1 <= length){
+                    for(let j = i;j<length;j++){
+                        let no = this.imageList.findIndex(v=>v.id ===this.ChooseList[j].id)
+                        if(no > -1){
+                            this.imageList[no].ChooseOrder--
+                        }
+                    }
+                    this.ChooseList.splice(i,1)
+                    item.isChoose = false
+                    item.checkOrder =0
+                }
+                
+            },
             editImage(item,index){
                 this.$prompt('请输入名称', '提示', {
                 confirmButtonText: '确定',
@@ -214,6 +216,17 @@ import AlbumsList from '../../components/image/AlbumsList'
                         order:0
                     })
                 }
+                for(var i = 0;i<30;i++){
+                    this.imageList.push(
+                        {
+                        id:i,
+                        url:'https://dss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2534506313,1688529724&fm=26&gp=0.jpg',
+                        name:'图片'+`${i}`,
+                        isChoose:false,
+                        ChooseOrder:0
+                    },
+                    )
+                }
             },
             openAlbum(obj){
                 //修改数据
@@ -253,7 +266,7 @@ import AlbumsList from '../../components/image/AlbumsList'
                 this.albums[this.albumsEditIndex].name=this.albumForm.name
                 this.albums[this.albumsEditIndex].order=this.albumForm.order
             },
-            imageList(index){
+            imageLists(index){
                 this.albumsIndex = index
             },
             imageDel(index){
@@ -302,4 +315,10 @@ import AlbumsList from '../../components/image/AlbumsList'
     color: #333;
 
   }
+  .redborder{
+      border-left: 1px solid red;
+      border-right: 1px solid red;
+     
+  }
+
 </style>
