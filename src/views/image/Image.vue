@@ -14,6 +14,8 @@
       ></el-input>
       <el-button type="primary" size="mini">搜索</el-button>
       </div>
+      <el-button v-if="ChooseList.length" type="warning" size="mini" @click="unChoose">取消选择</el-button>
+      <el-button type="danger" size="mini" @click="imageDelAll" v-if="ChooseList.length">批量删除</el-button>
       <el-button type="success" size="mini" @click=openAlbum(false)>创建相册</el-button>
       <el-button type="warning" size="mini" @click="uploadModel=true">上传图片</el-button>
 
@@ -54,7 +56,25 @@
       </el-main>
     </el-container>
   </el-container>
-    <el-footer>Footer</el-footer>
+    <el-footer class="border-top d-flex  align-items-center px-0">
+        <div style="width:200px" class="border-right flex-shrink:0 h-100 d-flex align-items-center justify-content-center ">
+            <el-button-group>
+                <el-button size="mini">上一页</el-button>
+                <el-button size="mini">下一页</el-button>
+            </el-button-group>
+        </div>
+        <div style="flex:1" class="px-2">
+                 <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="[100, 200, 300, 400]"
+      :page-size="100"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="400">
+    </el-pagination>
+        </div>
+    </el-footer>
 </el-container>
 <!-- 修改创建相册 -->
 <el-dialog
@@ -130,11 +150,9 @@ import AlbumsList from '../../components/image/AlbumsList'
                 ],
                 ChooseList:[],
                 imageList:[
-                   
-                    
-                    
-
-                ]
+             
+                ],
+                currentPage:1
 
             }
         },
@@ -147,6 +165,51 @@ import AlbumsList from '../../components/image/AlbumsList'
             this.__init()
         },
         methods:{
+            //分类
+              handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+      },
+      handleCurrentChange(val) {
+        console.log(`当前页: ${val}`);
+      },
+      //取消选中
+      unChoose(){
+          this.imageList.forEach(img=>{
+           let i = this.ChooseList.findIndex(item=>{
+                  return item.id === img.id
+              })
+              console.log(i)
+              if(i>-1){
+                  img.isChoose = false
+                  img.checkOrder = 0
+                  this.ChooseList.splice(i,1)
+              }
+          })
+      },
+            //批量删除
+            imageDelAll(){
+
+                 this.$confirm('是否删除选中图片', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type:"warning"
+                }).then(() => {
+                    
+                let list = this.imageList.filter(img=>{
+                    return !this.ChooseList.some(c=>{
+                        return c.id ===img.id
+                    })
+                })
+                this.imageList = list
+                this.ChooseList =[]
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功' 
+                        });
+                })
+     
+
+            },
             imageClick(item){
                 if(!item.isChoose){
                     this.ChooseList.push({id:item.id,url:item.url })
@@ -302,7 +365,7 @@ import AlbumsList from '../../components/image/AlbumsList'
   
   }
  .el-footer {
-     background-color: #eee;
+   
      color: #333;
   }
   
